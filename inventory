@@ -1,0 +1,611 @@
+import java.awt.Button;
+
+public class inventory extends JFrame implements ActionListener {
+
+	private JPanel contentPane;
+	private final JPanel panel = new JPanel();
+	private JTextField amount;
+	JTextPane textPane = new JTextPane();
+	JRadioButton rdbtnEcon = new JRadioButton("economy", true);
+	JRadioButton rdbtnStan = new JRadioButton("standard");
+	JRadioButton rdbtnAdv = new JRadioButton("advanced");
+	JRadioButton rdbtnExc = new JRadioButton("exceptional");
+	JComboBox comboBox = new JComboBox();
+	String filename = "inventory";
+	
+	
+	int econsum, standsum, advansum, excepsum;
+	int counter = 0;
+	int newsum;
+	String newcolor;
+	String newsize;
+	String color[] = {};
+	String size[] = {};
+	int sum[] = {};
+	JLabel lblsizecount = new JLabel("economy: " + econsum + " standard: " + standsum + " advanced: " + advansum +" exceptional: " + excepsum);
+	DataOutputStream output;
+	DataInputStream input;
+	/**********************************
+	 *
+	 * Launch the application.
+	 *
+	 *************************************/
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					inventory frame = new inventory();
+					frame.setJMenuBar(frame.createMenuBar());
+					frame.setVisible(true);
+					frame.setSize(500,350);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+/**********************************************************
+ * 
+ * Creates the frame.
+ * 
+ **************************************************************/
+	public inventory() {
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		
+		
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		panel.setBounds(12, 12, 97, 300);
+		contentPane.add(panel);
+
+		JLabel lblColor = new JLabel("Color");
+
+		comboBox.setModel(new DefaultComboBoxModel(new String[] { "red",
+				"green", "blue", "yellow" }));
+
+		JLabel lblSize = new JLabel("Size");
+
+		rdbtnEcon.setHorizontalAlignment(SwingConstants.LEFT);
+
+		rdbtnStan.setHorizontalAlignment(SwingConstants.LEFT);
+
+		rdbtnAdv.setHorizontalAlignment(SwingConstants.LEFT);
+
+		rdbtnExc.setHorizontalAlignment(SwingConstants.LEFT);
+
+		ButtonGroup coloratio = new ButtonGroup();
+
+		coloratio.add(rdbtnEcon);
+		coloratio.add(rdbtnStan);
+		coloratio.add(rdbtnAdv);
+		coloratio.add(rdbtnExc);
+
+		Button Submitbutton = new Button("Submit");
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		panel.add(lblColor);
+		panel.add(comboBox);
+		panel.add(lblSize);
+		panel.add(rdbtnEcon);
+		panel.add(rdbtnStan);
+		panel.add(rdbtnAdv);
+		panel.add(rdbtnExc);
+
+		JLabel lblAmount = new JLabel("Amount");
+		panel.add(lblAmount);
+
+		amount = new JTextField();
+		amount.setHorizontalAlignment(SwingConstants.CENTER);
+		amount.setText("0");
+		panel.add(amount);
+		amount.setColumns(7);
+		panel.add(Submitbutton);
+		textPane.setEditable(false);
+
+		textPane.setBounds(139, 71, 297, 177);
+		contentPane.add(textPane);
+		textPane = addTextToTextPane();
+		setTabsAndStyles(textPane);
+
+		Panel panel_1 = new Panel();
+		panel_1.setBounds(139, 30, 297, 35);
+		contentPane.add(panel_1);
+
+		Button Colorbutton = new Button("Color");
+		panel_1.add(Colorbutton);
+
+		Button Sizebutton = new Button("Size");
+		panel_1.add(Sizebutton);
+
+		Button Amountbutton = new Button("Amount");
+		panel_1.add(Amountbutton);
+		
+		lblsizecount.setBounds(12, 0, 424, 15);
+		contentPane.add(lblsizecount);
+
+		Submitbutton.addActionListener(this);
+		Colorbutton.addActionListener(this);
+		Sizebutton.addActionListener(this);
+		Amountbutton.addActionListener(this);
+
+	}
+
+/****************************************************
+ * 
+ * This keeps count of the differnt sizes of widgets
+ * 
+ ****************************************************/
+	
+	
+	public void amountsize(int i){
+		
+		if(size[i].equals("Economy")){
+			
+			econsum = 0;
+			 econsum += sum[i];
+			 
+			 lblsizecount.setText("economy: " + econsum+"" + " standard: " + standsum+"" + " advanced: " + advansum+"" +" exceptional: " + excepsum+"");
+
+		}
+		if(size[i].equals("Standard")){
+			
+			standsum = 0;
+			standsum += sum[i];
+			
+			lblsizecount.setText("economy: " + econsum+"" + " standard: " + standsum+"" + " advanced: " + advansum+"" +" exceptional: " + excepsum+"");
+		}
+		if(size[i].equals("Advance")){
+			
+			advansum = 0;
+			advansum += sum[i];
+			
+			lblsizecount.setText("economy: " + econsum+"" + " standard: " + standsum+"" + " advanced: " + advansum+"" +" exceptional: " + excepsum+"");
+		}
+		if(size[i].equals("Exceptional")){
+			
+			excepsum = 0;
+			excepsum += sum[i];
+			
+			lblsizecount.setText("economy: " + econsum+"" + " standard: " + standsum+"" + " advanced: " + advansum+"" +" exceptional: " + excepsum+"");
+		}
+		
+		
+	}
+	
+	/**************************************************************************
+	 * 
+	 * adds text to JTextPane 
+	 * 
+	 ***********************************************************************/
+
+	public JTextPane addTextToTextPane() {
+
+		Document doc = textPane.getDocument();
+
+		try {
+			// clear previous text
+			doc.remove(0, doc.getLength());
+
+			// insert title
+			doc.insertString(0, "Color\tSize\tAmount\n",
+					textPane.getStyle("large"));
+
+			// insert detail
+			for (int j = 0; j < color.length; j++) {
+				
+				
+				// sets the title style to bold
+				doc.insertString(doc.getLength(), color[j] + "\t",
+						textPane.getStyle("bold"));
+
+				// sets the year to style regular
+				doc.insertString(doc.getLength(), size[j] + "\t",
+						textPane.getStyle("regular"));
+
+				// sets the publisher style to regulur
+				doc.insertString(doc.getLength(), sum[j] + "\n",
+						textPane.getStyle("regular")); 
+				amountsize(j);
+
+			}
+		} catch (BadLocationException ble) {
+
+			System.err.println("Couldn't insert text.");
+
+		}
+
+		return textPane;
+
+	}
+/**************************************************************************
+ * 
+ * this enlarges arrays for int type arrys
+ * 
+ ***********************************************************************/
+	
+	//overloaded method so it can take int
+	public int[] enlargeArray(int[] currentArray) {
+		// enlarges any sting array
+		int[] newArray = new int[currentArray.length + 1];
+		for (int i = 0; i < currentArray.length; i++)
+			newArray[i] = currentArray[i];
+
+		// returns new value for array
+		return newArray;
+	}
+	
+/**************************************************************************
+* 
+* this enlarges arrays for string arrays
+* 
+***********************************************************************/
+	
+	public String[] enlargeArray(String[] currentArray) {
+		// enlarges any sting array
+		String[] newArray = new String[currentArray.length + 1];
+		for (int i = 0; i < currentArray.length; i++)
+			newArray[i] = currentArray[i];
+
+		// returns new value for array
+		return newArray;
+	}
+
+	
+	/************************************************************************************
+	 * 
+	 * this method is for sorting
+	 * 
+	 *********************************************************************************/
+public void sort(String tempArray[])
+	
+	{
+	
+		// loop to control number of passes
+		for (int pass = 1; pass < tempArray.length; pass++)
+	
+			{
+				for (int element = 0; element < tempArray.length - 1; element++){
+	
+						if (tempArray[element].compareTo(tempArray[element + 1])>0)
+							{
+	
+								swap(size, element, element + 1);// sorts size
+								swap(color, element, element + 1);// sorts color
+								swap(sum, element, element + 1);
+	
+								}
+							}
+			}
+	addTextToTextPane();
+	}
+/**************************************************************************
+ * 
+ * overload sort method MIGHT NEED MORE WORK ON THIS
+ * 
+ *************************************************************************/
+
+
+
+public void sort(int tempArray[])
+
+{
+
+	// loop to control number of passes
+	for (int pass = 1; pass < tempArray.length; pass++)
+
+		{
+			for (int element = 0; element < tempArray.length - 1; element++){
+
+					if (Integer.compare((tempArray[element + 1]),(tempArray[element])) > 0)
+						{	
+							swap(sum, element, element + 1);// sorts the sum
+							swap(size, element, element + 1);// sorts size
+							swap(color, element, element + 1);// sorts color
+							
+
+							}
+						}
+		}
+addTextToTextPane();
+}
+
+/*************************************************
+ * 
+ * this will swap string arrays for sorting
+ * 
+ ************************************************/
+
+public void swap(String swapArray[], int first, int second)
+
+{
+
+String hold; //temporary holding area for swap
+hold = swapArray[first];
+swapArray[first] = swapArray[second];
+swapArray[second] = hold;
+
+}
+
+/******************************************************
+ * 
+ * overload the swap method
+ * 
+ *****************************************************/
+
+public void swap(int swapArray[], int first, int second)
+
+{
+
+int hold; //temporary holding area for swap
+hold = swapArray[first];
+swapArray[first] = swapArray[second];
+swapArray[second] = hold;
+
+}
+
+/**********************************************************************
+ * 
+ * sets the style 
+ * 
+ ***************************************************************************/
+
+	protected void setTabsAndStyles(JTextPane textPane) {
+
+		// creates Tab Stops
+		TabStop[] tabs = new TabStop[3];
+		tabs[0] = new TabStop(200, TabStop.ALIGN_LEFT, TabStop.LEAD_NONE);// creates
+		// Tab
+		// Stops
+		tabs[1] = new TabStop(300, TabStop.ALIGN_LEFT, TabStop.LEAD_NONE);// creates
+		// Tab
+		// Stops
+		tabs[2] = new TabStop(400, TabStop.ALIGN_LEFT, TabStop.LEAD_NONE);// creates
+		// Tab
+		// Stops
+		TabSet tabset = new TabSet(tabs);
+
+		// set Tab Style
+		StyleContext tabStyle = StyleContext.getDefaultStyleContext();
+		AttributeSet aset = tabStyle.addAttribute(SimpleAttributeSet.EMPTY,
+				StyleConstants.TabSet, tabset);
+		textPane.setParagraphAttributes(aset, false);
+
+		// set Font Style
+		Style fontStyle = StyleContext.getDefaultStyleContext().getStyle(
+				StyleContext.DEFAULT_STYLE);
+		Style regular = textPane.addStyle("regular", fontStyle);
+		StyleConstants.setFontFamily(fontStyle, "SansSerif");
+		Style s = textPane.addStyle("italic", regular);
+		StyleConstants.setItalic(s, true);
+		s = textPane.addStyle("bold", regular);
+		StyleConstants.setBold(s, true);
+
+		s = textPane.addStyle("large", regular);
+		StyleConstants.setFontSize(s, 16);
+	}
+/**********************************************************
+ * 
+ * this method creates the menu bar for the program it should have file and open
+ * 
+ *********************************************************/
+	
+	public JMenuBar createMenuBar()
+	{
+		JMenuBar mnuBar = new JMenuBar();
+		setJMenuBar(mnuBar);
+			
+		JMenu mnuEdit = new JMenu("File", true);
+		mnuEdit.setMnemonic(KeyEvent.VK_F);
+		mnuEdit.setDisplayedMnemonicIndex(0);
+		mnuBar.add(mnuEdit);
+		//menu for new book
+	JMenuItem mnuEditInsert = new JMenuItem("Load");
+		mnuEditInsert.setMnemonic(KeyEvent.VK_O);
+		mnuEditInsert.setDisplayedMnemonicIndex(0);
+		mnuEdit.add(mnuEditInsert);
+		mnuEditInsert.setActionCommand("Load");
+		mnuEditInsert.addActionListener(this);
+		//menu for search
+		
+		JMenuItem mnuEditSave = new JMenuItem("Save");
+		mnuEditSave.setMnemonic(KeyEvent.VK_S);
+		mnuEditSave.setDisplayedMnemonicIndex(1);
+		mnuEdit.add(mnuEditSave);
+		mnuEditSave.setActionCommand("Save");
+		mnuEditSave.addActionListener(this);
+		
+			
+			return mnuBar;
+	}
+	
+/**************************************************************************
+ * 
+ * this is the action performed this will handle the submit, amount, color, size bottons
+ * 
+ ***********************************************************************/
+	
+	public void actionPerformed(ActionEvent e) {
+
+		String action = e.getActionCommand();
+
+		// spearates the buttons so this one is the submit button
+		if (action.equals("Submit")) {
+
+
+			if (rdbtnEcon.isSelected()) {
+			
+				newsize = "Economy";	
+
+				}
+
+					if (rdbtnStan.isSelected()) {
+					
+						newsize = "Standard";
+	
+						}
+
+						if (rdbtnAdv.isSelected()) {
+					
+							newsize = "Advance";
+		
+
+						}
+							if (rdbtnExc.isSelected()) {
+			
+								newsize = "Exceptional";
+						
+
+							}
+
+				switch (comboBox.getSelectedIndex())
+
+				{
+				// does the case statements
+				case 0:
+					newcolor = "red";
+					
+					break;
+
+				case 1:
+					newcolor = "green";
+
+					break;
+
+				case 2:
+					newcolor = "blue";
+		
+					break;
+
+				case 3:
+					newcolor = "yellow";
+
+					break;
+
+				}
+				
+				String tempnumstr = amount.getText();
+				newsum = Integer.parseInt(tempnumstr);
+				
+
+				
+				for(int i = 0; i < size.length; i++) {
+					  
+					if(color[i].equals(newcolor) && size[i].equals(newsize)) {
+						
+						int tempnum;
+				
+						tempnum = sum[i] + newsum;
+						
+						sum[i] = tempnum;
+						
+						addTextToTextPane();
+						return;
+					  }
+					}
+				sum = enlargeArray(sum);
+				size = enlargeArray(size);
+				color = enlargeArray(color);
+				
+				
+				sum[color.length - 1] = newsum;
+			
+				size[size.length - 1] = newsize;
+				
+				color[color.length - 1] = newcolor;
+				
+				sum[color.length -1] = newsum;
+				
+				
+			addTextToTextPane();
+			
+		} 
+		
+
+		if (action.equals("Color")) {
+			
+			sort(color);
+			
+		}
+		if (action.equals("Size")) {
+
+			sort(size);
+			
+		}
+		if (action.equals("Amount")) {
+			
+			sort(sum);
+
+		}
+		
+/***********************************************************
+ * 
+ * need more work this is when you click the open file
+ * 
+***********************************************************/
+		if(action.equals("Save")){
+			
+			try
+			{
+					
+			output = new DataOutputStream(new FileOutputStream(filename));
+			
+			for(int i = 0; i < size.length; i++) {	
+				
+			output.writeUTF(color[i]);
+			output.writeUTF(size[i]);
+			output.writeUTF(sum[i] + "");
+			
+			}
+			}
+			catch(IOException io)
+			{
+			JOptionPane.showMessageDialog(null,"The program could not create a storage location. Please check the disk drive and then run the program again.","Error",JOptionPane.INFORMATION_MESSAGE);}
+			//System.exit(1);
+		
+		}
+
+		
+		if(action.equals("Load")){
+			try{
+				input = new DataInputStream(new FileInputStream(filename));				
+			 do
+			 {
+				
+			 	sum = enlargeArray(sum);
+				size = enlargeArray(size);
+				color = enlargeArray(color);
+				
+				color[color.length - 1] = input.readUTF();
+
+				size[size.length - 1] = input.readUTF();
+				
+				
+				sum[color.length - 1] = Integer.parseInt(input.readUTF());
+				
+				
+				counter++;
+				
+				addTextToTextPane();
+				}
+			 while(counter < 100);
+					{
+					
+						return;
+					
+				}
+				
+			}
+			catch(IOException io)
+			{
+				JOptionPane.showMessageDialog(null,"File loaded","Error",JOptionPane.INFORMATION_MESSAGE);}
+				
+			}
+			
+		}
+}
+		
